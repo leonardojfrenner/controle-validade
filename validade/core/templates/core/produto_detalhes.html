@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h3>Detalhes do Produto</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Código de Barras:</strong> {{ produto.codigo_barras }}</p>
+                    <p><strong>Descrição:</strong> {{ produto.descricao }}</p>
+                    <p><strong>Categoria:</strong> {{ produto.get_categoria_display }}</p>
+                    <p><strong>Data de Validade:</strong> {{ produto.data_validade }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Quantidade:</strong> {{ produto.quantidade }}</p>
+                    <p><strong>Lote:</strong> {{ produto.lote }}</p>
+                    <p><strong>Data de Cadastro:</strong> {{ produto.data_cadastro }}</p>
+                    <p><strong>Status:</strong> {{ produto.get_status_display }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Voltar</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,107 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <h2>{% if produto %}Editar{% else %}Novo{% endif %} Produto</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="codigo_barras" class="form-label">Código de Barras</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="codigo_barras" name="codigo_barras" 
+                           value="{{ produto.codigo_barras|default:'' }}" required
+                           {% if produto %}readonly{% endif %}>
+                    {% if not produto %}
+                    <button type="button" class="btn btn-secondary" onclick="consultarProduto()">
+                        Verificar
+                    </button>
+                    {% endif %}
+                </div>
+                <div id="produto-info" class="form-text mt-2"></div>
+            </div>
+            <div class="mb-3">
+                <label for="descricao" class="form-label">Descrição</label>
+                <input type="text" class="form-control" id="descricao" name="descricao" 
+                       value="{{ produto.descricao|default:'' }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="categoria" class="form-label">Categoria</label>
+                <select class="form-select" id="categoria" name="categoria" required>
+                    <option value="">Selecione uma categoria</option>
+                    <option value="MEDICAMENTO" {% if produto.categoria == 'MEDICAMENTO' %}selected{% endif %}>Medicamento</option>
+                    <option value="CONTROLADO" {% if produto.categoria == 'CONTROLADO' %}selected{% endif %}>Controlado</option>
+                    <option value="TERMOLABEL" {% if produto.categoria == 'TERMOLABEL' %}selected{% endif %}>Termolábel</option>
+                    <option value="ALIMENTO" {% if produto.categoria == 'ALIMENTO' %}selected{% endif %}>Alimento</option>
+                    <option value="PERFUMARIA" {% if produto.categoria == 'PERFUMARIA' %}selected{% endif %}>Perfumaria</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="data_validade" class="form-label">Data de Validade</label>
+                <input type="date" class="form-control" id="data_validade" name="data_validade" 
+                       value="{{ produto.data_validade|date:'Y-m-d'|default:'' }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="quantidade" class="form-label">Quantidade</label>
+                <input type="number" class="form-control" id="quantidade" name="quantidade" 
+                       value="{{ produto.quantidade|default:'' }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="lote" class="form-label">Lote</label>
+                <input type="text" class="form-control" id="lote" name="lote" 
+                       value="{{ produto.lote|default:'' }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+<script>
+function consultarProduto() {
+    const codigoBarras = document.getElementById('codigo_barras').value;
+    const infoDiv = document.getElementById('produto-info');
+    
+    if (!codigoBarras) {
+        alert('Por favor, insira um código de barras');
+        return;
+    }
+    
+    infoDiv.innerHTML = '<div class="alert alert-info">Verificando produto...</div>';
+    
+    fetch(`/consultar-produto/?codigo_barras=${codigoBarras}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.encontrado) {
+                document.getElementById('descricao').value = data.descricao;
+                infoDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        Produto encontrado no histórico!<br>
+                        A descrição foi preenchida automaticamente.
+                    </div>`;
+            } else {
+                document.getElementById('descricao').value = '';
+                infoDiv.innerHTML = `
+                    <div class="alert alert-info">
+                        Novo produto! Por favor, preencha a descrição.
+                    </div>`;
+            }
+        })
+        .catch(error => {
+            infoDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    Erro ao consultar produto. Por favor, tente novamente.
+                </div>`;
+            console.error('Erro:', error);
+        });
+}
+
+// Adiciona evento para consultar ao pressionar Enter no campo de código de barras
+document.getElementById('codigo_barras').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault(); // Previne o envio do formulário
+        consultarProduto();
+    }
+});
+</script>
+{% endblock %} 

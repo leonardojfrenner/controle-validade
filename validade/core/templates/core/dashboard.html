@@ -1,0 +1,410 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    {% if categoria_selecionada %}
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item active">{{ categoria_selecionada|title }}</li>
+            </ol>
+        </nav>
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">
+            {% if categoria_selecionada %}
+                {{ categoria_selecionada|title }}
+            {% else %}
+                Dashboard
+            {% endif %}
+        </h2>
+        <a href="{% url 'produto_novo' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Novo Produto
+        </a>
+    </div>
+</div>
+
+{% if not categoria_selecionada %}
+<div class="stats-container mb-4">
+    <div class="card category-card">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="fas fa-pills me-2"></i>Medicamentos
+            </h5>
+            <p class="card-text">{{ total_medicamentos }}</p>
+            <a href="?categoria=MEDICAMENTO" class="btn btn-outline-primary">Ver Medicamentos</a>
+        </div>
+    </div>
+    
+    <div class="card category-card">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="fas fa-prescription me-2"></i>Controlados
+            </h5>
+            <p class="card-text">{{ total_controlados }}</p>
+            <a href="?categoria=CONTROLADO" class="btn btn-outline-primary">Ver Controlados</a>
+        </div>
+    </div>
+    
+    <div class="card category-card">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="fas fa-temperature-low me-2"></i>Termolábeis
+            </h5>
+            <p class="card-text">{{ total_termolabeis }}</p>
+            <a href="?categoria=TERMOLABEL" class="btn btn-outline-primary">Ver Termolábeis</a>
+        </div>
+    </div>
+    
+    <div class="card category-card">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="fas fa-apple-alt me-2"></i>Alimentos
+            </h5>
+            <p class="card-text">{{ total_alimentos }}</p>
+            <a href="?categoria=ALIMENTO" class="btn btn-outline-primary">Ver Alimentos</a>
+        </div>
+    </div>
+    
+    <div class="card category-card">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="fas fa-spray-can me-2"></i>Perfumaria
+            </h5>
+            <p class="card-text">{{ total_perfumaria }}</p>
+            <a href="?categoria=PERFUMARIA" class="btn btn-outline-primary">Ver Perfumaria</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if produtos_vencendo %}
+<div class="alert alert-danger fade-in">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <h5 class="mb-0">Produtos próximos ao vencimento (15 dias ou menos):</h5>
+    </div>
+    <ul class="list-unstyled mt-3">
+        {% for produto in produtos_vencendo %}
+            <li class="mb-2">
+                <i class="fas fa-circle me-2"></i>
+                {{ produto.descricao }} ({{ produto.get_categoria_display }})
+                <strong>Vence em: {{ produto.data_validade }}</strong>
+                <span class="badge bg-danger">{{ produto.dias_para_vencer }} dias</span>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-body">
+        <form id="produtosForm" action="{% url 'confirmar_retirada' %}" method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3 d-flex gap-2">
+                <button type="button" class="btn btn-warning" onclick="confirmarRetirada()">
+                    <i class="fas fa-check-circle me-1"></i> Confirmar Retirada
+                </button>
+                
+                <button type="button" class="btn btn-success" onclick="exportarSelecionados()">
+                    <i class="fas fa-file-excel me-1"></i> Exportar Selecionados
+                </button>
+            </div>
+
+            {% if produtos %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="selectAll" onclick="toggleAll(this)">
+                                </div>
+                            </th>
+                            <th>Código</th>
+                            <th>Descrição</th>
+                            <th>Categoria</th>
+                            <th>Validade</th>
+                            <th>Qtd</th>
+                            <th>Lote</th>
+                            <th>Dias Restantes</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for produto in produtos %}
+                        <tr class="{% if produto.status_validade == 'danger' %}table-danger{% elif produto.status_validade == 'warning' %}table-warning{% endif %}">
+                            <td>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="produtos_selecionados" value="{{ produto.id }}">
+                                </div>
+                            </td>
+                            <td>{{ produto.codigo_barras }}</td>
+                            <td>{{ produto.descricao }}</td>
+                            <td>
+                                <span class="badge bg-primary">{{ produto.get_categoria_display }}</span>
+                            </td>
+                            <td>{{ produto.data_validade }}</td>
+                            <td>{{ produto.quantidade }}</td>
+                            <td>{{ produto.lote }}</td>
+                            <td>
+                                {% if produto.dias_para_vencer <= 15 %}
+                                    <span class="badge bg-danger">{{ produto.dias_para_vencer }} dias</span>
+                                {% elif produto.dias_para_vencer <= 90 %}
+                                    <span class="badge bg-warning text-dark">{{ produto.dias_para_vencer }} dias</span>
+                                {% else %}
+                                    <span class="badge bg-success">{{ produto.dias_para_vencer }} dias</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'produto_detalhes' produto.pk %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-box-open fa-3x mb-3"></i>
+                <h4>Nenhum produto encontrado</h4>
+                <p class="text-muted">
+                    {% if categoria_selecionada %}
+                        Não há produtos na categoria {{ categoria_selecionada|title }}.
+                    {% else %}
+                        Não há produtos cadastrados.
+                    {% endif %}
+                </p>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<script>
+function confirmarRetirada() {
+    const form = document.getElementById('produtosForm');
+    const checkboxes = document.getElementsByName('produtos_selecionados');
+    const selecionados = Array.from(checkboxes).some(cb => cb.checked);
+    
+    if (!selecionados) {
+        Swal.fire({
+            title: 'Atenção!',
+            text: 'Selecione pelo menos um produto para retirar.',
+            icon: 'warning',
+            confirmButtonColor: '#4a90e2',
+            background: '#fff',
+            customClass: {
+                confirmButton: 'btn btn-primary'
+            }
+        });
+        return;
+    }
+    
+    Swal.fire({
+        title: 'Motivo da Retirada',
+        input: 'text',
+        inputLabel: 'Por favor, informe o motivo da retirada',
+        inputPlaceholder: 'Digite o motivo...',
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#4a90e2',
+        cancelButtonColor: '#6c757d',
+        background: '#fff',
+        customClass: {
+            container: 'custom-swal-container',
+            popup: 'custom-swal-popup',
+            header: 'custom-swal-header',
+            title: 'custom-swal-title',
+            closeButton: 'custom-swal-close',
+            content: 'custom-swal-content',
+            input: 'form-control',
+            actions: 'custom-swal-actions',
+            confirmButton: 'btn btn-primary',
+            cancelButton: 'btn btn-secondary'
+        },
+        inputValidator: (value) => {
+            if (!value) {
+                return 'O motivo é obrigatório!';
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const motivoInput = document.createElement('input');
+            motivoInput.type = 'hidden';
+            motivoInput.name = 'motivo';
+            motivoInput.value = result.value;
+            form.appendChild(motivoInput);
+            form.submit();
+        }
+    });
+}
+
+function exportarSelecionados() {
+    const checkboxes = document.getElementsByName('produtos_selecionados');
+    const selecionados = Array.from(checkboxes).filter(cb => cb.checked);
+    
+    if (selecionados.length === 0) {
+        Swal.fire({
+            title: 'Atenção!',
+            text: 'Selecione pelo menos um produto para exportar.',
+            icon: 'warning',
+            confirmButtonColor: '#4a90e2'
+        });
+        return;
+    }
+
+    // Coletar dados dos produtos selecionados de forma mais organizada
+    const dados = [];
+    selecionados.forEach(checkbox => {
+        const row = checkbox.closest('tr');
+        const diasRestantes = row.cells[7].querySelector('.badge').textContent.replace(' dias', '');
+        dados.push({
+            codigo: row.cells[1].textContent.trim(),
+            descricao: row.cells[2].textContent.trim(),
+            categoria: row.cells[3].querySelector('.badge').textContent.trim(),
+            validade: row.cells[4].textContent.trim(),
+            quantidade: row.cells[5].textContent.trim(),
+            lote: row.cells[6].textContent.trim(),
+            dias_restantes: diasRestantes
+        });
+    });
+
+    // Ordenar por data de validade
+    dados.sort((a, b) => {
+        const dataA = new Date(a.validade.split('/').reverse().join('-'));
+        const dataB = new Date(b.validade.split('/').reverse().join('-'));
+        return dataA - dataB;
+    });
+
+    // Criar CSV com formatação melhorada
+    let csv = 'Código;Descrição;Categoria;Data de Validade;Quantidade;Lote;Dias Restantes\n';
+    dados.forEach(item => {
+        // Remover possíveis ponto e vírgulas do texto para não quebrar o CSV
+        const descricaoFormatada = item.descricao.replace(/;/g, ',');
+        
+        csv += [
+            item.codigo,
+            descricaoFormatada,
+            item.categoria,
+            item.validade,
+            item.quantidade,
+            item.lote,
+            item.dias_restantes
+        ].join(';') + '\n';
+    });
+
+    // Converter para o formato correto (UTF-8 com BOM para Excel)
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const data = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+    
+    // Nome do arquivo com categoria se estiver filtrado
+    const categoria = '{{ categoria_selecionada }}';
+    const nomeArquivo = categoria ? 
+        `controle_validade_${categoria.toLowerCase()}_${data}.csv` : 
+        `controle_validade_${data}.csv`;
+
+    // Download do arquivo
+    if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, nomeArquivo);
+    } else {
+        link.href = window.URL.createObjectURL(blob);
+        link.download = nomeArquivo;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // Mensagem de sucesso
+    Swal.fire({
+        title: 'Sucesso!',
+        text: 'Relatório exportado com sucesso!',
+        icon: 'success',
+        confirmButtonColor: '#4a90e2',
+        timer: 2000
+    });
+}
+
+function toggleAll(source) {
+    const checkboxes = document.getElementsByName('produtos_selecionados');
+    for(let checkbox of checkboxes) {
+        checkbox.checked = source.checked;
+    }
+}
+</script>
+
+<style>
+/* Estilos personalizados para o SweetAlert2 */
+.custom-swal-popup {
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.custom-swal-title {
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.custom-swal-content {
+    margin-top: 1rem;
+}
+
+.swal2-input {
+    border: 1px solid #ced4da !important;
+    border-radius: 5px !important;
+    padding: 10px 15px !important;
+    margin: 1rem 0 !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    box-shadow: none !important;
+}
+
+.swal2-input:focus {
+    border-color: #4a90e2 !important;
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25) !important;
+}
+
+.custom-swal-actions {
+    margin-top: 1.5rem;
+}
+
+.swal2-confirm {
+    background-color: #4a90e2 !important;
+    padding: 8px 20px !important;
+}
+
+.swal2-cancel {
+    background-color: #6c757d !important;
+    padding: 8px 20px !important;
+}
+
+.swal2-confirm:focus, .swal2-cancel:focus {
+    box-shadow: none !important;
+}
+
+/* Adicione estes estilos para os botões */
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+</style>
+{% endblock %} 
