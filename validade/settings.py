@@ -94,7 +94,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
-    BASE_DIR / 'core' / 'static',  # Adicionando o diretório static do core
+    # Removendo temporariamente: BASE_DIR / 'core' / 'static',
 ]
 
 # Whitenoise Configuration

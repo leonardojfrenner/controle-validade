@@ -4,9 +4,8 @@ set -o errexit
 
 pip install -r requirements.txt
 
-# Limpar migrações existentes (opcional, use com cuidado)
-# find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+# Criar diretório static se não existir
+mkdir -p static
 
-python manage.py makemigrations
 python manage.py migrate --noinput
 python manage.py collectstatic --no-input
