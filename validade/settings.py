@@ -12,6 +12,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-r(s(-nflp=$8+^muw5uv0
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'controle-validade.onrender.com',
     'localhost',
     '127.0.0.1'
 ]
