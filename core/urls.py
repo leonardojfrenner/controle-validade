@@ -15,4 +15,5 @@ urlpatterns = [
     path('produto/<int:pk>/detalhes/', views.produto_detalhes, name='produto_detalhes'),
     path('confirmar-retirada/', views.confirmar_retirada, name='confirmar_retirada'),
     path('historico/', views.historico, name='historico'),
+    path('ajuda/', views.ajuda, name='ajuda'),
 ] 

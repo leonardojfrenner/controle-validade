@@ -11,6 +11,7 @@ from django.http import HttpResponse, JsonResponse
 from django.utils.text import slugify
 from datetime import datetime
 import requests
+import os
 
 def register(request):
     if request.method == 'POST':
@@ -110,10 +111,8 @@ def produto_excluir(request, pk):
 
 @login_required
 def exportar_excel(request):
-    # Obtém os IDs dos produtos selecionados
     produtos_ids = request.POST.getlist('produtos_selecionados')
     
-    # Se houver produtos selecionados, filtra apenas eles
     if produtos_ids:
         produtos = Produto.objects.filter(
             farmacia=request.user,
@@ -125,27 +124,88 @@ def exportar_excel(request):
     # Cria DataFrame com os dados
     data = []
     for produto in produtos:
+        dias_restantes = (produto.data_validade - timezone.now().date()).days
         data.append({
-            'Código de Barras': produto.codigo_barras,
-            'Descrição': produto.descricao,
-            'Data de Validade': produto.data_validade,
-            'Quantidade': produto.quantidade,
-            'Lote': produto.lote,
-            'Status': 'Próximo ao vencimento' if produto.proximo_vencimento else 'Normal'
+            'Código': str(produto.codigo_barras),  # Convertendo para string
+            'Descrição': str(produto.descricao),
+            'Categoria': str(produto.categoria),
+            'Data de Validade': produto.data_validade.strftime('%d/%m/%Y'),  # Formatando data
+            'Quantidade': str(produto.quantidade),
+            'Lote': str(produto.lote),
+            'Dias Restantes': dias_restantes
         })
     
     df = pd.DataFrame(data)
     
-    # Cria o arquivo Excel
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     nome_arquivo = f'produtos_{slugify(request.user.nome_loja)}_{timestamp}.xlsx'
     
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename="{nome_arquivo}"'
+    with pd.ExcelWriter(nome_arquivo, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Produtos')
+        
+        workbook = writer.book
+        worksheet = writer.sheets['Produtos']
+        
+        # Formato para cabeçalho
+        header_format = workbook.add_format({
+            'bold': True,
+            'font_size': 11,
+            'bg_color': '#D9D9D9',
+            'border': 1,
+            'align': 'center',
+            'valign': 'vcenter',
+            'text_wrap': True
+        })
+        
+        # Formato para células normais
+        cell_format = workbook.add_format({
+            'font_size': 10,
+            'border': 1,
+            'align': 'left',
+            'valign': 'vcenter'
+        })
+        
+        # Formato para números
+        number_format = workbook.add_format({
+            'font_size': 10,
+            'border': 1,
+            'align': 'right',
+            'valign': 'vcenter'
+        })
+        
+        # Definir larguras específicas para cada coluna
+        column_widths = {
+            'Código': 15,
+            'Descrição': 30,
+            'Categoria': 15,
+            'Data de Validade': 15,
+            'Quantidade': 12,
+            'Lote': 12,
+            'Dias Restantes': 12
+        }
+        
+        # Aplicar formatos e larguras
+        for col_num, (col_name, width) in enumerate(column_widths.items()):
+            worksheet.set_column(col_num, col_num, width)
+            worksheet.write(0, col_num, col_name, header_format)
+            
+            # Aplicar formato específico para cada coluna
+            if col_name in ['Código', 'Dias Restantes', 'Quantidade']:
+                for row_num in range(len(df)):
+                    worksheet.write(row_num + 1, col_num, df.iloc[row_num][col_name], number_format)
+            else:
+                for row_num in range(len(df)):
+                    worksheet.write(row_num + 1, col_num, df.iloc[row_num][col_name], cell_format)
     
-    # Salva o DataFrame como Excel
-    df.to_excel(response, index=False, engine='openpyxl')
+    # Ler e retornar o arquivo
+    with open(nome_arquivo, 'rb') as file:
+        response = HttpResponse(
+            file.read(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{nome_arquivo}"'
     
+    os.remove(nome_arquivo)
     return response
 
 def consultar_produto(request):
@@ -210,3 +270,7 @@ def historico(request):
     ).order_by('-data_retirada')
     
     return render(request, 'core/historico.html', {'produtos': produtos_retirados})
+
+@login_required
+def ajuda(request):
+    return render(request, 'core/ajuda.html')

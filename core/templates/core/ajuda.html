@@ -1,0 +1,204 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-question-circle text-primary me-2"></i>Central de Ajuda</h2>
+            <p class="text-muted">Encontre respostas para as principais dúvidas sobre o sistema.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Menu lateral -->
+        <div class="col-md-3 mb-4">
+            <div class="list-group">
+                <a href="#inicio" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                    <i class="fas fa-home me-2"></i>Início
+                </a>
+                <a href="#produtos" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-box me-2"></i>Produtos
+                </a>
+                <a href="#vencimentos" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-calendar-alt me-2"></i>Vencimentos
+                </a>
+                <a href="#exportacao" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-file-export me-2"></i>Exportação
+                </a>
+                <a href="#dicas" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                    <i class="fas fa-lightbulb me-2"></i>Dicas
+                </a>
+            </div>
+        </div>
+
+        <!-- Conteúdo -->
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- Início -->
+                <div class="tab-pane fade show active" id="inicio">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title mb-4">Bem-vindo ao Controle de Validade</h4>
+                            <p>Este sistema foi desenvolvido para ajudar sua farmácia a:</p>
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start">
+                                        <div class="feature-icon bg-primary bg-gradient text-white rounded-3 me-3 p-3">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div>
+                                            <h5>Controle Eficiente</h5>
+                                            <p class="text-muted">Gerencie todos os produtos e suas datas de validade.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start">
+                                        <div class="feature-icon bg-success bg-gradient text-white rounded-3 me-3 p-3">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                        <div>
+                                            <h5>Alertas Automáticos</h5>
+                                            <p class="text-muted">Receba avisos sobre produtos próximos ao vencimento.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produtos -->
+                <div class="tab-pane fade" id="produtos">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title mb-4">Gerenciamento de Produtos</h4>
+                            
+                            <h5 class="text-primary"><i class="fas fa-plus-circle me-2"></i>Cadastro de Produtos</h5>
+                            <ol class="mb-4">
+                                <li>Clique em "Novo Produto" no menu superior</li>
+                                <li>Digite o código de barras do produto</li>
+                                <li>Preencha a descrição e demais informações</li>
+                                <li>Selecione a categoria apropriada</li>
+                                <li>Informe a data de validade</li>
+                                <li>Digite a quantidade e o lote</li>
+                                <li>Clique em "Salvar"</li>
+                            </ol>
+
+                            <h5 class="text-primary"><i class="fas fa-edit me-2"></i>Edição de Produtos</h5>
+                            <ul class="mb-4">
+                                <li>Localize o produto no dashboard</li>
+                                <li>Clique no botão de edição</li>
+                                <li>Atualize as informações necessárias</li>
+                                <li>Salve as alterações</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vencimentos -->
+                <div class="tab-pane fade" id="vencimentos">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title mb-4">Controle de Vencimentos</h4>
+                            
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                O sistema mostra automaticamente produtos que vencerão nos próximos 15 dias.
+                            </div>
+
+                            <h5 class="mt-4">Códigos de Cores:</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <span class="badge bg-warning text-dark">Amarelo</span>
+                                    Produtos que vencem em até 15 dias
+                                </li>
+                                <li class="mb-2">
+                                    <span class="badge bg-danger">Vermelho</span>
+                                    Produtos vencidos
+                                </li>
+                                <li class="mb-2">
+                                    <span class="badge bg-success">Verde</span>
+                                    Produtos dentro do prazo
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exportação -->
+                <div class="tab-pane fade" id="exportacao">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title mb-4">Exportação de Dados</h4>
+                            
+                            <h5 class="text-primary mb-3"><i class="fas fa-file-excel me-2"></i>Exportar para Excel</h5>
+                            <p>Para exportar seus dados:</p>
+                            <ol>
+                                <li>Selecione os produtos desejados no dashboard</li>
+                                <li>Clique no botão "Exportar Selecionados"</li>
+                                <li>O arquivo Excel será baixado automaticamente</li>
+                            </ol>
+
+                            <div class="alert alert-info mt-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                O arquivo exportado contém todas as informações dos produtos selecionados.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dicas -->
+                <div class="tab-pane fade" id="dicas">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title mb-4">Dicas e Boas Práticas</h4>
+                            
+                            <div class="tips-list">
+                                <div class="tip-item mb-4">
+                                    <h5 class="text-primary"><i class="fas fa-star me-2"></i>Cadastro Eficiente</h5>
+                                    <p>Mantenha as descrições padronizadas e complete todos os campos para melhor organização.</p>
+                                </div>
+
+                                <div class="tip-item mb-4">
+                                    <h5 class="text-primary"><i class="fas fa-clock me-2"></i>Verificação Regular</h5>
+                                    <p>Consulte o dashboard diariamente para monitorar produtos próximos ao vencimento.</p>
+                                </div>
+
+                                <div class="tip-item">
+                                    <h5 class="text-primary"><i class="fas fa-sync me-2"></i>Mantenha Atualizado</h5>
+                                    <p>Atualize o status dos produtos assim que forem retirados ou vendidos.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.feature-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tips-list .tip-item {
+    border-left: 4px solid #0d6efd;
+    padding-left: 1rem;
+}
+
+.list-group-item i {
+    width: 20px;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+</style>
+{% endblock %} 
