@@ -28,51 +28,56 @@
 {% if not categoria_selecionada %}
 <div class="stats-container mb-4">
     <div class="card category-card">
-        <div class="card-body">
-            <h5 class="card-title">
-                <i class="fas fa-pills me-2"></i>Medicamentos
+        <div class="card-body text-center d-flex flex-column align-items-center">
+            <h5 class="card-title d-flex align-items-center">
+                <i class="fas fa-pills me-2"></i>
+                <span>Medicamentos</span>
             </h5>
-            <p class="card-text">{{ total_medicamentos }}</p>
+            <p class="card-text mb-3">{{ total_medicamentos }}</p>
             <a href="?categoria=MEDICAMENTO" class="btn btn-outline-primary">Ver Medicamentos</a>
         </div>
     </div>
     
     <div class="card category-card">
-        <div class="card-body">
-            <h5 class="card-title">
-                <i class="fas fa-prescription me-2"></i>Controlados
+        <div class="card-body text-center d-flex flex-column align-items-center">
+            <h5 class="card-title d-flex align-items-center">
+                <i class="fas fa-prescription me-2"></i>
+                <span>Controlados</span>
             </h5>
-            <p class="card-text">{{ total_controlados }}</p>
+            <p class="card-text mb-3">{{ total_controlados }}</p>
             <a href="?categoria=CONTROLADO" class="btn btn-outline-primary">Ver Controlados</a>
         </div>
     </div>
     
     <div class="card category-card">
-        <div class="card-body">
-            <h5 class="card-title">
-                <i class="fas fa-temperature-low me-2"></i>Termolábeis
+        <div class="card-body text-center d-flex flex-column align-items-center">
+            <h5 class="card-title d-flex align-items-center">
+                <i class="fas fa-temperature-low me-2"></i>
+                <span>Termolábeis</span>
             </h5>
-            <p class="card-text">{{ total_termolabeis }}</p>
+            <p class="card-text mb-3">{{ total_termolabeis }}</p>
             <a href="?categoria=TERMOLABEL" class="btn btn-outline-primary">Ver Termolábeis</a>
         </div>
     </div>
     
     <div class="card category-card">
-        <div class="card-body">
-            <h5 class="card-title">
-                <i class="fas fa-apple-alt me-2"></i>Alimentos
+        <div class="card-body text-center d-flex flex-column align-items-center">
+            <h5 class="card-title d-flex align-items-center">
+                <i class="fas fa-apple-alt me-2"></i>
+                <span>Alimentos</span>
             </h5>
-            <p class="card-text">{{ total_alimentos }}</p>
+            <p class="card-text mb-3">{{ total_alimentos }}</p>
             <a href="?categoria=ALIMENTO" class="btn btn-outline-primary">Ver Alimentos</a>
         </div>
     </div>
     
     <div class="card category-card">
-        <div class="card-body">
-            <h5 class="card-title">
-                <i class="fas fa-spray-can me-2"></i>Perfumaria
+        <div class="card-body text-center d-flex flex-column align-items-center">
+            <h5 class="card-title d-flex align-items-center">
+                <i class="fas fa-spray-can me-2"></i>
+                <span>Perfumaria</span>
             </h5>
-            <p class="card-text">{{ total_perfumaria }}</p>
+            <p class="card-text mb-3">{{ total_perfumaria }}</p>
             <a href="?categoria=PERFUMARIA" class="btn btn-outline-primary">Ver Perfumaria</a>
         </div>
     </div>
@@ -405,6 +410,57 @@ function toggleAll(source) {
 
 .gap-2 {
     gap: 0.5rem;
+}
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.category-card {
+    height: 100%;
+    transition: transform 0.2s;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 1.5rem;
+}
+
+.card-title {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.card-title i {
+    font-size: 1rem;
+}
+
+.card-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #4a90e2;
+}
+
+.btn-outline-primary {
+    width: 100%;
+    margin-top: auto;
 }
 </style>
 {% endblock %} 

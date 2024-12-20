@@ -9,10 +9,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-r(s(-nflp=$8+^muw5uv06gyqa$t&38_k&_*bz$&!x%0ud=g@g')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Temporariamente True para ver o erro
+DEBUG = True
 
 ALLOWED_HOSTS = [
-    'controle-validade.onrender.com',
     'localhost',
     '127.0.0.1'
 ]
@@ -94,7 +93,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
-    # Removendo temporariamente: BASE_DIR / 'core' / 'static',
+    # Removendo temporariamente o diretório core/static
+    # BASE_DIR / 'core' / 'static',
 ]
 
 # Whitenoise Configuration
@@ -121,12 +121,14 @@ if 'RENDER' in os.environ:  # Se estiver em produção
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
 else:  # Se estiver em desenvolvimento
+    DEBUG = True
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
-    SECURE_SSL_REDIRECT = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -135,6 +137,29 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL')
 EMAIL_HOST_PASSWORD = os.environ.get('PASSWORD')
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL')
+
+# Configuração para emails de erro (opcional, mas recomendado)
+ADMINS = [('Admin', os.environ.get('EMAIL'))]
+SERVER_EMAIL = os.environ.get('EMAIL')
+
+# Debug prints para verificar configurações
+print(f"Email configurado: {EMAIL_HOST_USER}")
+print(f"Senha configurada: {'*' * len(os.environ.get('PASSWORD', '')) if os.environ.get('PASSWORD') else 'Não encontrada'}")
+
+# Teste de envio de email ao iniciar
+from django.core.mail import send_mail
+try:
+    send_mail(
+        'Teste de Configuração',
+        'Este é um email de teste.',
+        EMAIL_HOST_USER,
+        [EMAIL_HOST_USER],
+        fail_silently=False,
+    )
+    print("Email de teste enviado com sucesso!")
+except Exception as e:
+    print(f"Erro ao enviar email: {str(e)}")
 
 # Logging configuration
 LOGGING = {

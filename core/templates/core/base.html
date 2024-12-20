@@ -83,57 +83,85 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
-    function showHelp() {
+    // Função global para mostrar toasts
+    function showToast(message, icon = 'warning', position = 'top') {
         Swal.fire({
-            title: 'Como usar o sistema',
-            html: `
-                <div class="text-start">
-                    <h5 class="mb-3">Principais funcionalidades:</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <i class="fas fa-plus-circle text-success"></i>
-                            <strong>Novo Produto:</strong> Cadastre produtos usando o código de barras
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-clock text-warning"></i>
-                            <strong>Alertas:</strong>
-                            <ul>
-                                <li>Vermelho: 15 dias ou menos para vencer</li>
-                                <li>Amarelo: Entre 16 e 90 dias para vencer</li>
-                            </ul>
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-filter text-primary"></i>
-                            <strong>Filtros:</strong> Use os cards para filtrar por categoria
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-check-circle text-success"></i>
-                            <strong>Retirada:</strong> Selecione produtos e confirme a retirada
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-history text-info"></i>
-                            <strong>Histórico:</strong> Consulte produtos retirados nos últimos 90 dias
-                        </li>
-                    </ul>
-                </div>
-            `,
-            icon: 'info',
-            confirmButtonText: 'Entendi!',
-            confirmButtonColor: '#4a90e2',
-            width: '600px'
+            toast: true,
+            position: position,
+            icon: icon,
+            title: message,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            customClass: {
+                popup: 'colored-toast',
+                title: 'toast-title'
+            }
         });
     }
 
-    // Auto-fechar mensagens após 5 segundos
-    document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            setTimeout(function() {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            }, 5000);
+    // Interceptar todos os alertas nativos do navegador
+    window.alert = function(message) {
+        showToast(message);
+    };
+
+    // Observer para substituir alertas nativos por toasts
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.nodeType === 1 && node.tagName === 'DIALOG') {
+                    node.remove();
+                    showToast(node.textContent);
+                }
+            });
         });
     });
+
+    // Observar mudanças no DOM
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
+    // Estilos globais para toasts
+    document.head.insertAdjacentHTML('beforeend', `
+        <style>
+            .colored-toast {
+                background-color: #f8f9fa !important;
+                color: #333 !important;
+                border-radius: 8px !important;
+                padding: 12px 20px !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+                font-family: 'Inter', sans-serif !important;
+            }
+
+            .toast-title {
+                font-size: 0.95rem !important;
+                font-weight: 500 !important;
+            }
+
+            .swal2-icon {
+                width: 1.5em !important;
+                height: 1.5em !important;
+                margin: 0.5em auto !important;
+            }
+
+            .swal2-show {
+                animation: fadeInDown 0.2s ease-out;
+            }
+
+            @keyframes fadeInDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+    `);
     </script>
 </body>
 </html> 
