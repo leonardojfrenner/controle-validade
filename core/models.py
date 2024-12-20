@@ -5,9 +5,15 @@ from datetime import timedelta
 
 class Farmacia(AbstractUser):
     nome_loja = models.CharField(max_length=100)
+    cpf = models.CharField(max_length=14, null=True, blank=True, help_text="Digite o CPF no formato: 000.000.000-00")
+    email = models.EmailField(null=True, blank=True)
     
     def __str__(self):
         return self.nome_loja
+
+    class Meta:
+        verbose_name = "Farmácia"
+        verbose_name_plural = "Farmácias"
 
 class Produto(models.Model):
     CATEGORIA_CHOICES = [

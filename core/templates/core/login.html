@@ -26,6 +26,12 @@
                     </div>
                 {% endfor %}
                 
+                <div class="text-end mb-3">
+                    <a href="{% url 'password_reset' %}" class="text-primary">
+                        <small>Esqueceu sua senha?</small>
+                    </a>
+                </div>
+                
                 <button type="submit" class="btn btn-primary w-100 mb-3">
                     <i class="fas fa-sign-in-alt me-2"></i>Entrar no Sistema
                 </button>

@@ -5,8 +5,8 @@
     <div class="card p-4 shadow-sm" style="max-width: 500px; width: 100%;">
         <div class="card-body">
             <div class="text-center mb-4">
-                <i class="fas fa-store fa-3x text-primary"></i>
-                <h3 class="card-title mt-3">Cadastro de Nova Farmácia</h3>
+                <i class="fas fa-user-plus fa-3x text-primary"></i>
+                <h3 class="card-title mt-3">Cadastro de Farmácia</h3>
                 <p class="text-muted">Preencha os dados para criar sua conta</p>
             </div>
 
@@ -15,17 +15,15 @@
                 {% for field in form %}
                     <div class="mb-3">
                         <label for="{{ field.id_for_label }}" class="form-label">
-                            {% if field.label == 'Username' %}Usuário{% else %}{{ field.label }}{% endif %}
+                            {{ field.label }}
                         </label>
                         {{ field }}
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
                         {% if field.errors %}
                             <div class="text-danger small mt-1">
                                 {{ field.errors }}
-                            </div>
-                        {% endif %}
-                        {% if field.help_text %}
-                            <div class="form-text text-muted small">
-                                {{ field.help_text }}
                             </div>
                         {% endif %}
                     </div>
@@ -37,7 +35,7 @@
             </form>
 
             <div class="text-center mt-3">
-                <p class="mb-0">Já possui uma conta?</p>
+                <p class="mb-0">Já tem uma conta?</p>
                 <a href="{% url 'login' %}" class="text-primary">Faça login aqui</a>
             </div>
         </div>

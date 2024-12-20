@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
-from .forms import FarmaciaCreationForm
+from .forms import FarmaciaRegistrationForm
 from .models import Farmacia, Produto
 from django.contrib import messages
 from django.utils import timezone
@@ -14,13 +14,12 @@ import requests
 
 def register(request):
     if request.method == 'POST':
-        form = FarmaciaCreationForm(request.POST)
+        form = FarmaciaRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('dashboard')
+            form.save()
+            return redirect('login')
     else:
-        form = FarmaciaCreationForm()
+        form = FarmaciaRegistrationForm()
     return render(request, 'core/register.html', {'form': form})
 
 @login_required
