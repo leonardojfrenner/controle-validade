@@ -11,6 +11,7 @@ class FarmaciaRegistrationForm(UserCreationForm):
     )
     email = forms.EmailField(
         label='Email',
+        required=True,
         widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'seu@email.com'})
     )
     nome_loja = forms.CharField(
@@ -24,7 +25,6 @@ class FarmaciaRegistrationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Adicionar classes Bootstrap aos campos existentes
         self.fields['username'].widget.attrs.update({'class': 'form-control'})
         self.fields['password1'].widget.attrs.update({'class': 'form-control'})
         self.fields['password2'].widget.attrs.update({'class': 'form-control'})
@@ -42,7 +42,17 @@ class FarmaciaRegistrationForm(UserCreationForm):
             # Formata o CPF
             cpf = f'{cpf[:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:]}'
             
+            # Verifica se o CPF já existe
+            if Farmacia.objects.filter(cpf=cpf).exists():
+                raise forms.ValidationError('Este CPF já está cadastrado.')
+            
         return cpf
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and Farmacia.objects.filter(email=email).exists():
+            raise forms.ValidationError('Este email já está cadastrado.')
+        return email
 
     def save(self, commit=True):
         user = super().save(commit=False)

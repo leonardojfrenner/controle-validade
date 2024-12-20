@@ -16,10 +16,19 @@ def register(request):
     if request.method == 'POST':
         form = FarmaciaRegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')
+            try:
+                user = form.save()
+                messages.success(request, 'Conta criada com sucesso! Faça login para continuar.')
+                return redirect('login')
+            except Exception as e:
+                messages.error(request, f'Erro ao criar conta: {str(e)}')
+        else:
+            for field in form:
+                for error in field.errors:
+                    messages.error(request, f'{field.label}: {error}')
     else:
         form = FarmaciaRegistrationForm()
+    
     return render(request, 'core/register.html', {'form': form})
 
 @login_required

@@ -9,10 +9,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-r(s(-nflp=$8+^muw5uv06gyqa$t&38_k&_*bz$&!x%0ud=g@g')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'RENDER' not in os.environ
+DEBUG = True  # Temporariamente True para ver o erro
 
 ALLOWED_HOSTS = [
-    'controle-validade.onrender.com',  # Substitua pelo seu domínio
+    'controle-validade.onrender.com',
     'localhost',
     '127.0.0.1'
 ]
@@ -135,3 +135,18 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL')
 EMAIL_HOST_PASSWORD = os.environ.get('PASSWORD')
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
